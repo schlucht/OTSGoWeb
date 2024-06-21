@@ -16,15 +16,16 @@ build:
 
 run: build
 	clear
-	@env ./dist/${BINARY_NAME} --version ${NEW_VERSION}
-	@echo ${NEW_VERSION} > ${VERSION_FILE}	
-
-
+	@env ./dist/${BINARY_NAME} --version ${NEW_VERSION}	
 
 clean:
 	@go clean
 	@rm -rf dist
 
 git:	
-	@git add . && git commit -m "bump version" && git tag -a ${NEW_VERSION} -m "${NEW_VERSION}"
+	@git add . && git commit -m $(TEXT) && git tag -a ${NEW_VERSION} -m "${NEW_VERSION}"
 	@git push && git push --tags
+	@echo ${NEW_VERSION} > ${VERSION_FILE}
+
+test:
+	@echo ${TEXT}
