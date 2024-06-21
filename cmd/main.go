@@ -10,4 +10,5 @@ func main() {
 	flag.Parse()
 	fmt.Println(*version)
 	fmt.Println("Hello, World!")
+	fmt.Println("Hello, wir sind dabei!")
 }

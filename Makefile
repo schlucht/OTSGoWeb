@@ -27,3 +27,4 @@ clean:
 
 git:	
 	@git add . && git commit -m "bump version" && git tag -a ${NEW_VERSION} -m "${NEW_VERSION}"
+	@git push && git push --tags
