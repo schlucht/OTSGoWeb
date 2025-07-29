@@ -18,8 +18,9 @@ func (app *application) routes() http.Handler {
 		AllowCredentials: true,
 		MaxAge:           300,
 	}))
-	
+
 	mux.Get("/", app.Home)
+	mux.Get("/signin", app.SignIn)
 	mux.NotFound(app.NotFound)
 
 	fileServer := http.FileServer(http.Dir("./assets"))

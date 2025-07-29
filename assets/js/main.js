@@ -1,0 +1,1 @@
+import OtsTitle from "./components/ots-title.js";

@@ -1,47 +1,40 @@
-BINARY_NAME=liam
+BINARY_NAME=otsgoweb
+PORT=5100
 
-VERSION_FILE=version.txt
-OLD_VERSION=$(shell cat ${VERSION_FILE})
-VERSION=${OLD_VERSION}
-VER=$(subst ., ,${VERSION})
-MAJOR=$(word 1,${VER})
-MINOR=$(word 2,${VER})
-PATCH=$(word 3,${VER})
-NEWPATCH=$(shell expr ${PATCH} + 1)
-NEW_VERSION=${MAJOR}.${MINOR}.${NEWPATCH}
-TEXT="ADD - Upload Project"
 
 build:
 	@go build -o dist/${BINARY_NAME} ./cmd
 
-run: build
-	clear
-	@env ./dist/${BINARY_NAME} --version ${NEW_VERSION}	
+api: build
+	@env ./dist/${BINARY_NAME} -port=${PORT} &
+	@echo "Backend running..."
 
-clean:
-	@go clean
-	@rm -rf dist
+start: docker api
 
 stop:
-	@pkill -f ${BINARY_NAME}
+	@-pkill -f ${BINARY_NAME}
 	@echo "Backend stopped..."
 
-restart: stop run	
+restart: stop api
+	clear
 
-git:	
-	@git add . && git commit -m ${TEXT} && 
+clean: stop
+	@go clean
+	@rm -R ./dist
 
-tagging:
-	@git tag -a ${NEW_VERSION} -m "${TEXT} - ${NEW_VERSION}"
-	@git push && git push --tags
-	@echo ${NEW_VERSION} > ${VERSION_FILE}
+newrun: stop api
 
-gitVersion: git tagging
-	@echo ${NEW_VERSION}
-
-# @if [ -z ${TEXT} ]; then echo "test"; else echo ${TEXT}; fi
 test:
-	ifeq(${TEXT},)		
-		echo ${TEXT}
-	endif
-	@echo ${TEXT}
+	@go test ./...
+
+install:
+	@go mod tidy
+
+docker:
+	docker compose up -d
+
+
+
+
+
+	

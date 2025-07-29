@@ -7,9 +7,12 @@
             {{ block "title" .}}
             {{ end }}
         </title>
-        <link href="../assets/style.css" rel="stylesheet">   
+        <link href="/assets/style.css" rel="stylesheet" type="text/css">  
+        <script src="/assets/js/main.js" type="module"></script> 
     </head>
     <body>
         {{ block "content" .}}{{ end }}
+        
+        {{ block "js" .}}{{end}}
     </body>
 {{ end }}

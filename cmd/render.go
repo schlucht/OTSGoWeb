@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"html/template"
 	"net/http"
+	"path/filepath"
 )
 
 type templateData struct {
@@ -73,17 +74,36 @@ func (app *application) parseTemplate(partials []string, page, templateToRender 
 			partials[i] = fmt.Sprintf("templates/partials/%s.partial.tmpl", x)
 		}
 	}
-	partials = append(partials, "templates/layouts/base.layout.tmpl", templateToRender)
-	if len(partials) > 0 {
-		t, err = template.New(fmt.Sprintf("%s.page.tmpl", page)).Funcs(functions).ParseFS(templateFS, partials...)
-	} else {
-		t, err = template.New(fmt.Sprintf("%s.page.tmpl", page)).Funcs(functions).ParseFS(templateFS, partials...)
-	}
+
+	// read Layouts
+	layouts, err := app.parseLayouts()
 	if err != nil {
-		app.errorLog.Println(err)
+		app.errorLog.Println("Find no layouts", err)
+		return nil, err
+	}
+
+	partials = append(partials, templateToRender)
+	partials = append(partials, layouts...)
+
+	t, err = template.New(fmt.Sprintf("%s.page.tmpl", page)).Funcs(functions).ParseFS(templateFS, partials...)
+	if err != nil {
+		app.errorLog.Println("Error parsing template files", err)
 		return nil, err
 	}
 
 	app.templateCache[templateToRender] = t
 	return t, nil
+}
+
+func (app *application) parseLayouts() ([]string, error) {
+	var paths []string
+	matches, err := filepath.Glob("./cmd/templates/layouts/*")
+	if err != nil {
+		return nil, err
+	}
+	for _, path := range matches {
+		_, path = filepath.Split(path)
+		paths = append(paths, filepath.Join("templates/layouts", path))
+	}
+	return paths, nil
 }
